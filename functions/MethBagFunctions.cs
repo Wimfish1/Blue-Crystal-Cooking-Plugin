@@ -22,10 +22,19 @@ namespace Ocelot.BlueCrystalCooking.functions
                             var item = new Item(
                                 BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId,
                                 EItemOrigin.ADMIN);
-                            if (!player.Inventory.tryAddItemAuto(item, true, true, false, false))
+
+                            if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.AddItemsDirectlyToInventory == true)
+                            {
+                                if (!player.Inventory.tryAddItemAuto(item, true, true, false, false))
+                                {
+                                    ItemManager.dropItem(new Item(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId, true), new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 2, raycastHit.transform.position.z), false, true, false);
+                                }
+                            }
+                            else
                             {
                                 ItemManager.dropItem(new Item(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId, true), new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 2, raycastHit.transform.position.z), false, true, false);
                             }
+
                             if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.EnableBlueCrystalFreezeEffect)
                             {
                                 EffectManager.sendEffect(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalFreezeEffectId, 10, raycastHit.transform.position);

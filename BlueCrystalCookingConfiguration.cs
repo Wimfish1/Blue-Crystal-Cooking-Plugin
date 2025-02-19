@@ -30,6 +30,7 @@ namespace Ocelot.BlueCrystalCooking
         [XmlArrayItem(ElementName = "Id")]
         public List<ushort> drugIngredientIds;
         public bool FreezerNeedsPower;
+        public bool AddItemsDirectlyToInventory;
 
         public void LoadDefaults()
         {
@@ -55,6 +56,7 @@ namespace Ocelot.BlueCrystalCooking
             BlueCrystalBagsAmountMin = 1;
             BlueCrystalBagsAmountMax = 3;
             FreezerNeedsPower = true;
+            AddItemsDirectlyToInventory = true;
         }
     }
 }
