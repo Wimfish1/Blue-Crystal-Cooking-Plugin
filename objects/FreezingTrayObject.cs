@@ -4,24 +4,24 @@ namespace Ocelot.BlueCrystalCooking
 {
     public class FreezingTrayObject
     {
-        public Transform transform;
-        public ulong owner;
-        public ulong group;
-        public float angle_x;
-        public float angle_y;
-        public float angle_z;
-        public Vector3 pos;
-        public int freezingSeconds;
-        public FreezingTrayObject(Transform transform, Vector3 pos, ulong owner, ulong group, float angle_x, float angle_y, float angle_z, int freezingSeconds)
+        public Transform Transform;
+        public ulong Owner;
+        public ulong Group;
+        public float AngleX;
+        public float AngleY;
+        public float AngleZ;
+        public Vector3 Pos;
+        public int FreezingSeconds;
+        public FreezingTrayObject(Transform transform, Vector3 pos, ulong owner, ulong group, float angleX, float angleY, float angleZ, int freezingSeconds)
         {
-            this.transform = transform;
-            this.pos = pos;
-            this.owner = owner;
-            this.group = group;
-            this.angle_x = angle_x;
-            this.angle_y = angle_y;
-            this.angle_z = angle_z;
-            this.freezingSeconds = freezingSeconds;
+            this.Transform = transform;
+            this.Pos = pos;
+            this.Owner = owner;
+            this.Group = group;
+            this.AngleX = angleX;
+            this.AngleY = angleY;
+            this.AngleZ = angleZ;
+            this.FreezingSeconds = freezingSeconds;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Ocelot.BlueCrystalCooking
         public int BlueCrystalBagsAmountMin;
         public int BlueCrystalBagsAmountMax;
         [XmlArrayItem(ElementName = "Id")]
-        public List<ushort> drugIngredientIds;
+        public List<ushort> DrugIngredientIds;
         public bool FreezerNeedsPower;
         public bool AddItemsDirectlyToInventory;
 
@@ -36,7 +36,7 @@ namespace Ocelot.BlueCrystalCooking
         {
             IconImageUrl = "https://i.imgur.com/fpl2UL7.png";
             BarrelObjectId = 10102;
-            drugIngredientIds = new List<ushort>() { 10103, 10104, 10105 };
+            DrugIngredientIds = new List<ushort>() { 10103, 10104, 10105 };
             BlueCrystalBagId = 10108;
             UseDrugEffectSpeed = true;
             DrugEffectSpeedMultiplier = 2;

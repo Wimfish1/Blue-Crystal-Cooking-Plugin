@@ -2,11 +2,11 @@
 {
     public class DrugeffectTimeObject
     {
-        public long time = BlueCrystalCookingPlugin.getCurrentTime();
-        public string playerId;
+        public long Time = BlueCrystalCookingPlugin.GetCurrentTime();
+        public string PlayerId;
         public DrugeffectTimeObject(string playerId)
         {
-            this.playerId = playerId;
+            this.PlayerId = playerId;
         }
     }
 }

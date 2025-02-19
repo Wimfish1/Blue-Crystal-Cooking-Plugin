@@ -23,7 +23,7 @@ namespace Ocelot.BlueCrystalCooking.functions
                                 BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId,
                                 EItemOrigin.ADMIN);
 
-                            if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.AddItemsDirectlyToInventory == true)
+                            if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.AddItemsDirectlyToInventory)
                             {
                                 if (!player.Inventory.tryAddItemAuto(item, true, true, false, false))
                                 {
@@ -78,7 +78,7 @@ namespace Ocelot.BlueCrystalCooking.functions
             UnturnedPlayer player = UnturnedPlayer.FromPlayer(instigatingPlayer);
             if (consumeableAsset.id == BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId)
             {
-                BlueCrystalCookingPlugin.Instance.drugeffectPlayersList.Add(new DrugeffectTimeObject(player.Id));
+                BlueCrystalCookingPlugin.Instance.DrugeffectPlayersList.Add(new DrugeffectTimeObject(player.Id));
                 if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
                 {
                     player.Player.movement.sendPluginSpeedMultiplier(BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugEffectSpeedMultiplier);
@@ -92,12 +92,12 @@ namespace Ocelot.BlueCrystalCooking.functions
 
         public static void Update()
         {
-            foreach (var drugeffect in BlueCrystalCookingPlugin.Instance.drugeffectPlayersList.ToList())
+            foreach (var drugeffect in BlueCrystalCookingPlugin.Instance.DrugeffectPlayersList.ToList())
             {
-                if (BlueCrystalCookingPlugin.getCurrentTime() - drugeffect.time >= BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugEffectDurationSecs)
+                if (BlueCrystalCookingPlugin.GetCurrentTime() - drugeffect.Time >= BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugEffectDurationSecs)
                 {
-                    BlueCrystalCookingPlugin.Instance.drugeffectPlayersList.Remove(drugeffect);
-                    UnturnedPlayer player = UnturnedPlayer.FromCSteamID(new CSteamID(ulong.Parse(drugeffect.playerId)));
+                    BlueCrystalCookingPlugin.Instance.DrugeffectPlayersList.Remove(drugeffect);
+                    UnturnedPlayer player = UnturnedPlayer.FromCSteamID(new CSteamID(ulong.Parse(drugeffect.PlayerId)));
                     if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
                     {
                         player.Player.movement.sendPluginSpeedMultiplier(1);

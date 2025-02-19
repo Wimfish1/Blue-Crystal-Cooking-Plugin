@@ -10,7 +10,7 @@ namespace Ocelot.BlueCrystalCooking.functions
         {
             if (barricadeTransform)
             {
-                BarricadeData bData = BlueCrystalCookingPlugin.Instance.getBarricadeDataAtPosition(barricadeTransform.position);
+                BarricadeData bData = BlueCrystalCookingPlugin.Instance.GetBarricadeDataAtPosition(barricadeTransform.position);
                 if (bData == null)
                     return;
 
@@ -18,18 +18,18 @@ namespace Ocelot.BlueCrystalCooking.functions
                 {
                     if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.BarrelObjectId == bData.barricade.id)
                     {
-                        BlueCrystalCookingPlugin.Instance.placedBarrelsTransformsIngredients.Remove(barricadeTransform);
+                        BlueCrystalCookingPlugin.Instance.PlacedBarrelsTransformsIngredients.Remove(barricadeTransform);
                     }
                     else if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalTrayId == bData.barricade.id)
                     {
-                        foreach(var tray in BlueCrystalCookingPlugin.Instance.freezingTrays.ToList())
+                        foreach(var tray in BlueCrystalCookingPlugin.Instance.FreezingTrays.ToList())
                         {
-                            if (tray.transform == null)
+                            if (!tray.Transform)
                                 return;
 
-                            if (tray.transform == barricadeTransform)
+                            if (tray.Transform == barricadeTransform)
                             {
-                                BlueCrystalCookingPlugin.Instance.freezingTrays.Remove(tray);
+                                BlueCrystalCookingPlugin.Instance.FreezingTrays.Remove(tray);
                             }
                         }
                     }
