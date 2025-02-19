@@ -1,23 +1,8 @@
-﻿using JetBrains.Annotations;
-using Rocket.API;
-using Rocket.API.Collections;
-using Rocket.Core;
-using Rocket.Core.Plugins;
-using Rocket.Unturned;
-using Rocket.Unturned.Chat;
-using Rocket.Unturned.Enumerations;
-using Rocket.Unturned.Events;
-using Rocket.Unturned.Player;
+﻿using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using UnityEngine;
-using Logger = Rocket.Core.Logging.Logger;
 
 namespace Ocelot.BlueCrystalCooking.functions
 {
@@ -34,7 +19,13 @@ namespace Ocelot.BlueCrystalCooking.functions
                         int random = UnityEngine.Random.Range(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagsAmountMin, BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagsAmountMax);
                         for (int i = 0; i < random; i++)
                         {
-                            ItemManager.dropItem(new Item(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId, true), new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 2, raycastHit.transform.position.z), false, true, false);
+                            var item = new Item(
+                                BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId,
+                                EItemOrigin.ADMIN);
+                            if (!player.Inventory.tryAddItemAuto(item, true, true, false, false))
+                            {
+                                ItemManager.dropItem(new Item(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalBagId, true), new Vector3(raycastHit.transform.position.x, raycastHit.transform.position.y + 2, raycastHit.transform.position.z), false, true, false);
+                            }
                             if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.EnableBlueCrystalFreezeEffect)
                             {
                                 EffectManager.sendEffect(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalFreezeEffectId, 10, raycastHit.transform.position);

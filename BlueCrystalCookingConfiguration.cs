@@ -46,14 +46,14 @@ namespace Ocelot.BlueCrystalCooking
             FrozenTrayId = 10107;
             LiquidTrayId = 10106;
             FreezerId = 10101;
-            BlueCrystalTrayFreezingTimeSecs = 5;
+            BlueCrystalTrayFreezingTimeSecs = 45;
             EnableBlueCrystalFreezeEffect = true;
             BlueCrystalFreezeEffectId = 63;
             EnableBarrelStirEffect = true;
             BarrelStirEffectId = 76;
             StirProgressAddPercentage = 10;
-            BlueCrystalBagsAmountMin = 2;
-            BlueCrystalBagsAmountMax = 5;
+            BlueCrystalBagsAmountMin = 1;
+            BlueCrystalBagsAmountMax = 3;
             FreezerNeedsPower = true;
         }
     }
