@@ -13,105 +13,58 @@ namespace Ocelot.BlueCrystalCooking.functions
         {
             if (player == null)
                 return;
-            if (Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward, out RaycastHit raycastHit, 2, RayMasks.BARRICADE))
+            if (!Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward,
+                    out var raycastHit, 2, RayMasks.BARRICADE)) return;
+            foreach (var barrel in BlueCrystalCookingPlugin.Instance.PlacedBarrelsTransformsIngredients.ToList())
             {
-                foreach (var barrel in BlueCrystalCookingPlugin.Instance.PlacedBarrelsTransformsIngredients.ToList())
+                if (!barrel.Key || !raycastHit.transform)
+                    break;
+                if (barrel.Key.position == raycastHit.transform.position)
                 {
-                    if (!barrel.Key || !raycastHit.transform)
-                        break;
-                    if (barrel.Key.position == raycastHit.transform.position)
+                    uint ingredientCount = 0;
+                    for (int i = 0; i < BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds.Count; i++)
                     {
-                        uint ingredientCount = 0;
-                        for (int i = 0; i < BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds.Count; i++)
+                        if (barrel.Value.Ingredients.Contains(BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds[i]))
                         {
-                            if (barrel.Value.Ingredients.Contains(BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds[i]))
-                            {
-                                ingredientCount += 1;
-                            }
+                            ingredientCount += 1;
                         }
-                        if (ingredientCount == BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds.Count)
-                        {
-                            if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.EnableBarrelStirEffect)
-                            {
-                                ingredientCount = 0;
-                                if (raycastHit.transform)
-                                {
-                                    EffectManager.sendEffect(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BarrelStirEffectId, 4, raycastHit.transform.position);
-                                }
-                            }
-                            barrel.Value.Progress += BlueCrystalCookingPlugin.Instance.Configuration.Instance.StirProgressAddPercentage;
-                        }
-                        else
+                    }
+                    if (ingredientCount == BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds.Count)
+                    {
+                        if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.EnableBarrelStirEffect)
                         {
                             ingredientCount = 0;
-                            ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("not_enough_ingredients"), Color.white, null, player.SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
+                            if (raycastHit.transform)
+                            {
+                                EffectManager.sendEffect(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BarrelStirEffectId, 4, raycastHit.transform.position);
+                            }
                         }
+                        barrel.Value.Progress += BlueCrystalCookingPlugin.Instance.Configuration.Instance.StirProgressAddPercentage;
                     }
-                    if (barrel.Value.Progress >= 100)
+                    else
                     {
-                        barrel.Value.Progress = 0;
-                        for (int i = 0; i < BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds.Count; i++)
-                        {
-                            barrel.Value.Ingredients.Remove(BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds[i]);
-                        }
-                        ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("stir_successful"), Color.white, null, player.SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
-                        BarricadeManager.dropBarricade(new Barricade(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalTrayId), null, player.Position, 0, 0, 0, (ulong)player.CSteamID, (ulong)player.Player.quests.groupID);
+                        ingredientCount = 0;
+                        ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("not_enough_ingredients"), Color.white, null, player.SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
                     }
+                }
+
+                if (barrel.Value.Progress < 100) continue;
+                {
+                    barrel.Value.Progress = 0;
+                    for (int i = 0; i < BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds.Count; i++)
+                    {
+                        barrel.Value.Ingredients.Remove(BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds[i]);
+                    }
+                    ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("stir_successful"), Color.white, null, player.SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
+                    BarricadeManager.dropBarricade(new Barricade(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalTrayId), null, player.Position, 0, 0, 0, (ulong)player.CSteamID, (ulong)player.Player.quests.groupID);
                 }
             }
         }
-        //public static void OnPlayerUpdateGesture(UnturnedPlayer player, UnturnedPlayerEvents.PlayerGesture gesture)
-        //{
-            
-        //    if (gesture == UnturnedPlayerEvents.PlayerGesture.PunchLeft || gesture == UnturnedPlayerEvents.PlayerGesture.PunchRight)
-        //    {
-        //        if (Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward, out RaycastHit raycastHit, 2, RayMasks.BARRICADE))
-        //        {
-        //            foreach (var barrel in BlueCrystalCookingPlugin.Instance.placedBarrelsTransformsIngredients.ToList())
-        //            {
-        //                if (barrel.Key.position == raycastHit.transform.position)
-        //                {
-        //                    uint ingredientCount = 0;
-        //                    for (int i = 0; i < BlueCrystalCookingPlugin.Instance.Configuration.Instance.drugIngredientIds.Count; i++)
-        //                    {
-        //                        if (barrel.Value.ingredients.Contains(BlueCrystalCookingPlugin.Instance.Configuration.Instance.drugIngredientIds[i]))
-        //                        {
-        //                            ingredientCount += 1;
-        //                        }
-        //                        }
-        //                    if (ingredientCount == BlueCrystalCookingPlugin.Instance.Configuration.Instance.drugIngredientIds.Count)
-        //                    {
-        //                        if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.EnableBarrelStirEffect)
-        //                        {
-        //                            ingredientCount = 0;
-        //                            EffectManager.sendEffect(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BarrelStirEffectId, 4, raycastHit.transform.position);
-        //                        }
-        //                        barrel.Value.progress += BlueCrystalCookingPlugin.Instance.Configuration.Instance.StirProgressAddPercentage;
-        //                    }
-        //                    else
-        //                    {
-        //                        ingredientCount = 0;
-        //                        ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("not_enough_ingredients"), Color.white, null, player.SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
-        //                    }
-        //                }
-        //                if (barrel.Value.progress >= 100)
-        //                {
-        //                    barrel.Value.progress = 0;
-        //                    for (int i = 0; i < BlueCrystalCookingPlugin.Instance.Configuration.Instance.drugIngredientIds.Count; i++)
-        //                    {
-        //                        barrel.Value.ingredients.Remove(BlueCrystalCookingPlugin.Instance.Configuration.Instance.drugIngredientIds[i]);
-        //                    }
-        //                    ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("stir_successful"), Color.white, null, player.SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
-        //                    BarricadeManager.dropBarricade(new Barricade(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalTrayId), null, player.Position, 0, 0, 0, (ulong)player.CSteamID, (ulong)player.Player.quests.groupID);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+        
         public static void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, ref Vector3 point, ref float angleX, ref float angleY, ref float angleZ, ref ulong owner, ref ulong group, ref bool shouldAllow)
         {
-            Vector3 pos = point;
-            ulong ownerBarricade = owner;
+            var pos = point;
+            var ownerBarricade = owner;
             if (barricade.id == BlueCrystalCookingPlugin.Instance.Configuration.Instance.BarrelObjectId)
             {
                 BlueCrystalCookingPlugin.Instance.Wait(0.2f, () => {
@@ -122,29 +75,20 @@ namespace Ocelot.BlueCrystalCooking.functions
 
             foreach (var drugObject in BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds)
             {
-                if (drugObject == barricade.id)
+                if (drugObject != barricade.id) continue;
+                if (!Physics.Raycast(pos, Vector3.down, out RaycastHit raycastHit, 10, RayMasks.BARRICADE)) continue;
+                if (!BarricadeManager.tryGetInfo(raycastHit.transform, out byte x, out byte y, out ushort plant,
+                        out ushort index, out BarricadeRegion region, out BarricadeDrop drop)) continue;
+                if (drop.asset.id != BlueCrystalCookingPlugin.Instance.Configuration.Instance.BarrelObjectId) continue;
+                foreach (var barrel in BlueCrystalCookingPlugin.Instance.PlacedBarrelsTransformsIngredients.ToList())
                 {
-                    if (Physics.Raycast(pos, Vector3.down, out RaycastHit raycastHit, 10, RayMasks.BARRICADE))
-                    {
-                        if (BarricadeManager.tryGetInfo(raycastHit.transform, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region, out BarricadeDrop drop))
-                        {
-                            if (drop.asset.id == BlueCrystalCookingPlugin.Instance.Configuration.Instance.BarrelObjectId)
-                            {
-                                foreach (var barrel in BlueCrystalCookingPlugin.Instance.PlacedBarrelsTransformsIngredients.ToList())
-                                {
-                                    if (barrel.Key == raycastHit.transform)
-                                    {
-                                        ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("ingredient_added", asset.itemName), Color.white, null, UnturnedPlayer.FromCSteamID(new CSteamID(ownerBarricade)).SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
-                                        barrel.Value.Ingredients.Add(barricade.id);
-                                        BlueCrystalCookingPlugin.Instance.Wait(0.2f, () => {
-                                            BarricadeManager.tryGetInfo(BlueCrystalCookingPlugin.Instance.GetPlacedObjectTransform(pos), out byte xingredient, out byte yingredient, out ushort plantingredient, out ushort indexingredient, out BarricadeRegion regioningredient);
-                                            BarricadeManager.destroyBarricade(regioningredient, xingredient, yingredient, plantingredient, indexingredient);
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    if (barrel.Key != raycastHit.transform) continue;
+                    ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("ingredient_added", asset.itemName), Color.white, null, UnturnedPlayer.FromCSteamID(new CSteamID(ownerBarricade)).SteamPlayer(), EChatMode.SAY, BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
+                    barrel.Value.Ingredients.Add(barricade.id);
+                    BlueCrystalCookingPlugin.Instance.Wait(0.2f, () => {
+                        BarricadeManager.tryGetInfo(BlueCrystalCookingPlugin.Instance.GetPlacedObjectTransform(pos), out byte xingredient, out byte yingredient, out ushort plantingredient, out ushort indexingredient, out BarricadeRegion regioningredient);
+                        BarricadeManager.destroyBarricade(regioningredient, xingredient, yingredient, plantingredient, indexingredient);
+                    });
                 }
             }
         }

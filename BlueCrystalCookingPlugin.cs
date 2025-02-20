@@ -51,19 +51,15 @@ namespace Ocelot.BlueCrystalCooking
             BarricadeManager.tryGetRegion(x, y, plant, out BarricadeRegion region);
             foreach (var drop in region.drops.ToList())
             {
-                if (drop.asset.id == Configuration.Instance.BarrelObjectId)
+                if (drop.asset.id != Configuration.Instance.BarrelObjectId) continue;
+                BarricadeData barricade = region.findBarricadeByInstanceID(drop.instanceID);
+                foreach (var item in PlacedBarrelsTransformsIngredients.ToList())
                 {
-                    BarricadeData barricade = region.findBarricadeByInstanceID(drop.instanceID);
-                    foreach (var item in PlacedBarrelsTransformsIngredients.ToList())
+                    if (item.Key.position != barricade.point) continue;
+                    BarricadeManager.tryGetInfo(GetPlacedObjectTransform(barricade.point), out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
                     {
-                        if (item.Key.position == barricade.point)
-                        {
-                            BarricadeManager.tryGetInfo(GetPlacedObjectTransform(barricade.point), out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
-                            if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
-                            {
-                                PlacedBarrelsTransformsIngredients.Remove(GetPlacedObjectTransform(barricade.point));
-                            }
-                        }
+                        PlacedBarrelsTransformsIngredients.Remove(GetPlacedObjectTransform(barricade.point));
                     }
                 }
             }
@@ -78,42 +74,34 @@ namespace Ocelot.BlueCrystalCooking
             UseableConsumeable.onConsumePerformed -= ConsumeAction;
             BarricadeManager.onDamageBarricadeRequested -= BarricadeDamaged;
         }
-        
-        private void ConsumeAction(Player instigatingPlayer, ItemConsumeableAsset consumeableAsset)
+
+        public void ConsumeAction(Player instigatingPlayer, ItemConsumeableAsset consumeableAsset)
         {
             MethBagFunctions.ConsumeAction(instigatingPlayer, consumeableAsset);
         }
 
-        private void OnGestureChanged(PlayerAnimator arg1, EPlayerGesture gesture)
+        public void OnGestureChanged(PlayerAnimator arg1, EPlayerGesture gesture)
         {
-            if (gesture == EPlayerGesture.PUNCH_LEFT || gesture == EPlayerGesture.PUNCH_RIGHT)
-            {
-                BarrelFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
-                MethBagFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
-            }
-                
+            if (gesture != EPlayerGesture.PUNCH_LEFT && gesture != EPlayerGesture.PUNCH_RIGHT) return;
+            BarrelFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
+            MethBagFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
+
         }
 
-        //private void OnPlayerUpdateGesture(UnturnedPlayer player, UnturnedPlayerEvents.PlayerGesture gesture)
-        //{
-        //    BarrelFunctions.OnPlayerUpdateGesture(player, gesture);
-        //    MethBagFunctions.OnPlayerUpdateGesture(player, gesture);
-        //}
-        
-        private void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, ref Vector3 point, ref float angleX, ref float angleY, ref float angleZ, ref ulong owner, ref ulong group, ref bool shouldAllow)
+        public void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, ref Vector3 point, ref float angleX, ref float angleY, ref float angleZ, ref ulong owner, ref ulong group, ref bool shouldAllow)
         {
             BarrelFunctions.BarricadeDeployed(barricade, asset, hit, point: ref point, angleX: ref angleX, angleY: ref angleY, angleZ: ref angleZ, owner: ref owner, group: ref group, shouldAllow: ref shouldAllow);
             FreezerFunctions.BarricadeDeployed(barricade, asset, hit, point: ref point, angleX: ref angleX, angleY: ref angleY, angleZ: ref angleZ, owner: ref owner, group: ref group, shouldAllow: ref shouldAllow);
         }
 
-        private void BarricadeDamaged(CSteamID instigatorSteamID, Transform barricadeTransform, ref ushort pendingTotalDamage, ref bool shouldAllow, EDamageOrigin damageOrigin)
+        public void BarricadeDamaged(CSteamID instigatorSteamID, Transform barricadeTransform, ref ushort pendingTotalDamage, ref bool shouldAllow, EDamageOrigin damageOrigin)
         {
             BarricadeFunctions.BarricadeDamaged(barricadeTransform, pendingTotalDamage);
         }
 
-        public static Dictionary<Vector3, Transform> GetAllObjects()
+        private static Dictionary<Vector3, Transform> GetAllObjects()
         {
-            Dictionary<Vector3, Transform> objectsOnMap = new Dictionary<Vector3, Transform>();
+            var objectsOnMap = new Dictionary<Vector3, Transform>();
             foreach (var region in BarricadeManager.regions)
             {
                 foreach (var drop in region.drops)
@@ -156,22 +144,20 @@ namespace Ocelot.BlueCrystalCooking
         private void AddExistingBarrels(int level)
         {
             Logger.Log("Adding map barrels to list...", ConsoleColor.Green);
-            List<ushort> ingredientsStandard = new List<ushort>();
+            var ingredientsStandard = new List<ushort>();
             foreach (var region in BarricadeManager.regions)
             {
                 foreach (var drop in region.drops)
                 {
-                    if (drop.asset.id == Configuration.Instance.BarrelObjectId)
+                    if (drop.asset.id != Configuration.Instance.BarrelObjectId) continue;
+                    BarricadeData barricade = region.findBarricadeByInstanceID(drop.instanceID);
+                    Transform barrelTransform = GetPlacedObjectTransform(barricade.point);
+                    if (PlacedBarrelsTransformsIngredients.ContainsKey(barrelTransform))
                     {
-                        BarricadeData barricade = region.findBarricadeByInstanceID(drop.instanceID);
-                        Transform barrelTransform = GetPlacedObjectTransform(barricade.point);
-                        if (PlacedBarrelsTransformsIngredients.ContainsKey(barrelTransform))
-                        {
-                            Logger.Log("Duplicated entry detected, skipping object. (No need to worry)", ConsoleColor.Yellow);
-                        } else
-                        {
-                            PlacedBarrelsTransformsIngredients.Add(barrelTransform, new BarrelObject(ingredientsStandard, 0));
-                        }
+                        Logger.Log("Duplicated entry detected, skipping object. (No need to worry)", ConsoleColor.Yellow);
+                    } else
+                    {
+                        PlacedBarrelsTransformsIngredients.Add(barrelTransform, new BarrelObject(ingredientsStandard, 0));
                     }
                 }
             }
@@ -192,13 +178,11 @@ namespace Ocelot.BlueCrystalCooking
             if (_frame % 5 != 0) return; // BRICHT METHODE AB WENN DER FRAME NICHT DURCH 5 TEILBAR IST
             // DO STUFF EVERY GAME FRAME E.G 60/s
 
-            if (GetCurrentTime() - timer >= 1)
-            {
-                timer = GetCurrentTime();
-                MethBagFunctions.Update();
-                FreezerFunctions.Update();
-            }
-            
+            if (GetCurrentTime() - timer < 1) return;
+            timer = GetCurrentTime();
+            MethBagFunctions.Update();
+            FreezerFunctions.Update();
+
         }
 
         public static Int32 GetCurrentTime()
