@@ -22,8 +22,9 @@ namespace Ocelot.BlueCrystalCooking.functions
             var angleZTray = angleZ;
             BlueCrystalCookingPlugin.Instance.Wait(0.5f, () =>
             {
-                Transform tray = BlueCrystalCookingPlugin.Instance.GetPlacedObjectTransform(pos);
-                BlueCrystalCookingPlugin.Instance.FreezingTrays.Add(new FreezingTrayObject(tray, pos, ownerTray, groupTray, angleXTray, angleYTray, angleZTray, 0));
+                var tray = BlueCrystalCookingPlugin.Instance.GetPlacedObjectTransform(pos);
+                BlueCrystalCookingPlugin.Instance.FreezingTrays.Add(new FreezingTrayObject(tray, pos, ownerTray,
+                    groupTray, angleXTray, angleYTray, angleZTray, 0));
             });
         }
         public static void Update()
@@ -43,7 +44,9 @@ namespace Ocelot.BlueCrystalCooking.functions
                         if (!BarricadeManager.tryGetInfo(tray.Transform, out var x, out var y, out var plant,
                                 out var index, out var region)) continue;
                         BarricadeManager.destroyBarricade(region, x, y, plant, index);
-                        BarricadeManager.dropBarricade(new Barricade(BlueCrystalCookingPlugin.Instance.Configuration.Instance.FrozenTrayId), null, tray.Pos, tray.AngleX, tray.AngleY, tray.AngleZ, tray.Owner, tray.Group);
+                        BarricadeManager.dropBarricade(
+                            new Barricade(BlueCrystalCookingPlugin.Instance.Configuration.Instance.FrozenTrayId), null,
+                            tray.Pos, tray.AngleX, tray.AngleY, tray.AngleZ, tray.Owner, tray.Group);
                         if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.EnableBlueCrystalFreezeEffect)
                         {
                             EffectManager.sendEffect(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalFreezeEffectId, 10, tray.Pos);
@@ -58,7 +61,9 @@ namespace Ocelot.BlueCrystalCooking.functions
                     if (!BarricadeManager.tryGetInfo(tray.Transform, out var x, out var y, out var plant, out var index,
                             out var region)) continue;
                     BarricadeManager.destroyBarricade(region, x, y, plant, index);
-                    BarricadeManager.dropBarricade(new Barricade(BlueCrystalCookingPlugin.Instance.Configuration.Instance.FrozenTrayId), null, tray.Pos, tray.AngleX, tray.AngleY, tray.AngleZ, tray.Owner, tray.Group);
+                    BarricadeManager.dropBarricade(
+                        new Barricade(BlueCrystalCookingPlugin.Instance.Configuration.Instance.FrozenTrayId), null,
+                        tray.Pos, tray.AngleX, tray.AngleY, tray.AngleZ, tray.Owner, tray.Group);
                     if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.EnableBlueCrystalFreezeEffect)
                     {
                         EffectManager.sendEffect(BlueCrystalCookingPlugin.Instance.Configuration.Instance.BlueCrystalFreezeEffectId, 10, tray.Pos);

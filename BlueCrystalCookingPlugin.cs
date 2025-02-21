@@ -29,7 +29,7 @@ namespace Ocelot.BlueCrystalCooking
             Instance = this;
             Logger.Log("BlueCrystalCookingPlugin v" + Version, ConsoleColor.Yellow);
             Logger.Log("Original Plugin By: Ocelot");
-            Logger.Log("Edited & Maintained by: Wimfish1", ConsoleColor.Blue);
+            Logger.Log("Edited & Maintained by: Wimfish1 :-)", ConsoleColor.Blue);
 
             BarricadeManager.onDeployBarricadeRequested += BarricadeDeployed;
             BarricadeManager.onSalvageBarricadeRequested += BarricadeSalvaged;
@@ -52,11 +52,13 @@ namespace Ocelot.BlueCrystalCooking
             foreach (var drop in region.drops.ToList())
             {
                 if (drop.asset.id != Configuration.Instance.BarrelObjectId) continue;
-                BarricadeData barricade = region.findBarricadeByInstanceID(drop.instanceID);
+                var barricade = region.findBarricadeByInstanceID(drop.instanceID);
                 foreach (var item in PlacedBarrelsTransformsIngredients.ToList())
                 {
                     if (item.Key.position != barricade.point) continue;
-                    BarricadeManager.tryGetInfo(GetPlacedObjectTransform(barricade.point), out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    BarricadeManager.tryGetInfo(GetPlacedObjectTransform(barricade.point), out byte xBarricade,
+                        out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade,
+                        out BarricadeRegion regionBarricade);
                     if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
                     {
                         PlacedBarrelsTransformsIngredients.Remove(GetPlacedObjectTransform(barricade.point));
@@ -70,7 +72,6 @@ namespace Ocelot.BlueCrystalCooking
             BarricadeManager.onDeployBarricadeRequested -= BarricadeDeployed;
             BarricadeManager.onSalvageBarricadeRequested -= BarricadeSalvaged;
             PlayerAnimator.OnGestureChanged_Global -= OnGestureChanged;
-            //UnturnedPlayerEvents.OnPlayerUpdateGesture -= OnPlayerUpdateGesture;
             UseableConsumeable.onConsumePerformed -= ConsumeAction;
             BarricadeManager.onDamageBarricadeRequested -= BarricadeDamaged;
         }
@@ -88,13 +89,20 @@ namespace Ocelot.BlueCrystalCooking
 
         }
 
-        public void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, ref Vector3 point, ref float angleX, ref float angleY, ref float angleZ, ref ulong owner, ref ulong group, ref bool shouldAllow)
+        public void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, ref Vector3 point,
+            ref float angleX, ref float angleY, ref float angleZ, ref ulong owner, ref ulong group,
+            ref bool shouldAllow)
         {
-            BarrelFunctions.BarricadeDeployed(barricade, asset, hit, point: ref point, angleX: ref angleX, angleY: ref angleY, angleZ: ref angleZ, owner: ref owner, group: ref group, shouldAllow: ref shouldAllow);
-            FreezerFunctions.BarricadeDeployed(barricade, asset, hit, point: ref point, angleX: ref angleX, angleY: ref angleY, angleZ: ref angleZ, owner: ref owner, group: ref group, shouldAllow: ref shouldAllow);
+            BarrelFunctions.BarricadeDeployed(barricade, asset, hit, point: ref point, angleX: ref angleX,
+                angleY: ref angleY, angleZ: ref angleZ, owner: ref owner, group: ref group,
+                shouldAllow: ref shouldAllow);
+            FreezerFunctions.BarricadeDeployed(barricade, asset, hit, point: ref point, angleX: ref angleX,
+                angleY: ref angleY, angleZ: ref angleZ, owner: ref owner, group: ref group,
+                shouldAllow: ref shouldAllow);
         }
 
-        public void BarricadeDamaged(CSteamID instigatorSteamID, Transform barricadeTransform, ref ushort pendingTotalDamage, ref bool shouldAllow, EDamageOrigin damageOrigin)
+        public void BarricadeDamaged(CSteamID instigatorSteamID, Transform barricadeTransform,
+            ref ushort pendingTotalDamage, ref bool shouldAllow, EDamageOrigin damageOrigin)
         {
             BarricadeFunctions.BarricadeDamaged(barricadeTransform, pendingTotalDamage);
         }
