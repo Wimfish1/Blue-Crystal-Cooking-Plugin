@@ -158,14 +158,33 @@ namespace Ocelot.BlueCrystalCooking
                 foreach (var drop in region.drops)
                 {
                     if (drop.asset.id != Configuration.Instance.BarrelObjectId) continue;
-                    BarricadeData barricade = region.findBarricadeByInstanceID(drop.instanceID);
-                    Transform barrelTransform = GetPlacedObjectTransform(barricade.point);
-                    if (PlacedBarrelsTransformsIngredients.ContainsKey(barrelTransform))
+                    var barricade = region.findBarricadeByInstanceID(drop.instanceID);
+
+                    if (barricade == null) continue;
+
+                    Transform barrelTransform = null;
+
+                    try
                     {
-                        Logger.Log("Duplicated entry detected, skipping object. (No need to worry)", ConsoleColor.Yellow);
-                    } else
+                        barrelTransform = GetPlacedObjectTransform(barricade.point);
+                        
+                        // Only add to dictionary if transform was successfully retrieved
+                        if (barrelTransform != null)
+                        {
+                            if (PlacedBarrelsTransformsIngredients.ContainsKey(barrelTransform))
+                            {
+                                Logger.Log("Duplicated entry detected, skipping object. (No need to worry)", ConsoleColor.Yellow);
+                            }
+                            else
+                            {
+                                PlacedBarrelsTransformsIngredients.Add(barrelTransform, new BarrelObject(ingredientsStandard, 0));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
                     {
-                        PlacedBarrelsTransformsIngredients.Add(barrelTransform, new BarrelObject(ingredientsStandard, 0));
+                        Logger.Log($"Error getting transform for barrel at {barricade.point}: {ex.Message}");
+                        // No need for continue here as it's the end of the loop body
                     }
                 }
             }
