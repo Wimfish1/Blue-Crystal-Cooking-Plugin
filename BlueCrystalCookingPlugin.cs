@@ -53,15 +53,24 @@ namespace Ocelot.BlueCrystalCooking
             {
                 if (drop.asset.id != Configuration.Instance.BarrelObjectId) continue;
                 var barricade = region.findBarricadeByInstanceID(drop.instanceID);
+
+                Transform barrelTransform = GetPlacedObjectTransform(barricade.point);
+
+                if (barrelTransform == null)
+                {
+                    Logger.LogWarning("Barricade Transform was null during salvage.");
+                    return;
+                }
+
                 foreach (var item in PlacedBarrelsTransformsIngredients.ToList())
                 {
                     if (item.Key.position != barricade.point) continue;
-                    BarricadeManager.tryGetInfo(GetPlacedObjectTransform(barricade.point), out byte xBarricade,
+                    BarricadeManager.tryGetInfo(barrelTransform, out byte xBarricade,
                         out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade,
                         out BarricadeRegion regionBarricade);
                     if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
                     {
-                        PlacedBarrelsTransformsIngredients.Remove(GetPlacedObjectTransform(barricade.point));
+                        PlacedBarrelsTransformsIngredients.Remove(barrelTransform);
                     }
                 }
             }
@@ -114,9 +123,12 @@ namespace Ocelot.BlueCrystalCooking
             {
                 foreach (var drop in region.drops)
                 {
-                    if (!objectsOnMap.ContainsKey(drop.model.position))
+                    if (drop.model != null && drop.model != null) //Added null check here.
                     {
-                        objectsOnMap.Add(drop.model.position, drop.model);
+                        if (!objectsOnMap.ContainsKey(drop.model.position))
+                        {
+                            objectsOnMap.Add(drop.model.position, drop.model);
+                        }
                     }
                 }
             }
