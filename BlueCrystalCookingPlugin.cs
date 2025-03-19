@@ -122,21 +122,7 @@ namespace Ocelot.BlueCrystalCooking
             }
             return objectsOnMap;
         }
-
-        public Transform GetPlacedObjectTransform(Vector3 objectPosition)
-        {
-            Dictionary<Vector3, Transform> objectsOnMap;
-            objectsOnMap = GetAllObjects();
-
-            foreach (var mapObject in objectsOnMap.ToList())
-            {
-                if (mapObject.Key == objectPosition)
-                {
-                    return mapObject.Value;
-                }
-            }
-            return null; //Never happens
-        }
+        
         public BarricadeData GetBarricadeDataAtPosition(Vector3 position)
         {
             foreach (var region in BarricadeManager.regions)
@@ -144,6 +130,21 @@ namespace Ocelot.BlueCrystalCooking
                 foreach (var b in region.barricades)
                 {
                     if (b.point == position) return b;
+                }
+            }
+            return null;
+        }
+
+        public Transform GetPlacedObjectTransform(Vector3 objectPosition)
+        {
+            Dictionary<Vector3, Transform> objectsOnMap = GetAllObjects();
+            float tolerance = 0.2f; 
+
+            foreach (var mapObject in objectsOnMap.ToList())
+            {
+                if (Vector3.Distance(mapObject.Key, objectPosition) < tolerance)
+                {
+                    return mapObject.Value;
                 }
             }
             return null;
@@ -167,8 +168,7 @@ namespace Ocelot.BlueCrystalCooking
                     try
                     {
                         barrelTransform = GetPlacedObjectTransform(barricade.point);
-                        
-                        // Only add to dictionary if transform was successfully retrieved
+
                         if (barrelTransform != null)
                         {
                             if (PlacedBarrelsTransformsIngredients.ContainsKey(barrelTransform))
@@ -180,11 +180,14 @@ namespace Ocelot.BlueCrystalCooking
                                 PlacedBarrelsTransformsIngredients.Add(barrelTransform, new BarrelObject(ingredientsStandard, 0));
                             }
                         }
+                        else
+                        {
+                            Logger.Log($"Could not find transform for barrel at {barricade.point}.", ConsoleColor.Red);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Error getting transform for barrel at {barricade.point}: {ex.Message}");
-                        // No need for continue here as it's the end of the loop body
+                        Logger.Log($"Error getting transform for barrel at {barricade.point}: {ex.Message}", ConsoleColor.Red);
                     }
                 }
             }
