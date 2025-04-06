@@ -8,6 +8,9 @@ namespace Ocelot.BlueCrystalCooking
     {
         // CONFIG VARIABLES
         public string IconImageUrl;
+        public bool RequireGasMask;
+        public ushort GasMaskId;
+        public float GasChance;
         public ushort BarrelObjectId;
         public ushort BlueCrystalBagId;
         public bool UseDrugEffectSpeed;
@@ -35,6 +38,9 @@ namespace Ocelot.BlueCrystalCooking
         public void LoadDefaults()
         {
             IconImageUrl = "https://i.imgur.com/fpl2UL7.png";
+            RequireGasMask = true;
+            GasMaskId = 1270;
+            GasChance = 0.2f;
             BarrelObjectId = 10102;
             DrugIngredientIds = new List<ushort>() { 10103, 10104, 10105 };
             BlueCrystalBagId = 10108;

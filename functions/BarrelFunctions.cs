@@ -3,7 +3,9 @@ using SDG.Unturned;
 using Steamworks;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEngine;
+using Random = System.Random;
 
 namespace Ocelot.BlueCrystalCooking.functions
 {
@@ -59,6 +61,27 @@ namespace Ocelot.BlueCrystalCooking.functions
                     for (var i = 0; i < BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds.Count; i++)
                     {
                         barrel.Value.Ingredients.Remove(BlueCrystalCookingPlugin.Instance.Configuration.Instance.DrugIngredientIds[i]);
+                    }
+
+                    if (BlueCrystalCookingPlugin.Instance.Configuration.Instance.RequireGasMask)
+                    {
+                        if (player.Player.clothing.hat != BlueCrystalCookingPlugin.Instance.Configuration.Instance.GasMaskId)
+                        {
+                            // Define the chance of blowing up (e.g., 20% chance)
+                            float blowUpChance = BlueCrystalCookingPlugin.Instance.Configuration.Instance.GasChance; // 20% chance
+                            Random random = new Random();
+                            float randomValue = (float)random.NextDouble(); // Generates a value between 0.0 and 1.0
+                    
+                            if (randomValue < blowUpChance)
+                            {
+                                ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("lethal_gas"),
+                                    Color.white, null, player.SteamPlayer(), EChatMode.SAY,
+                                    BlueCrystalCookingPlugin.Instance.Configuration.Instance.IconImageUrl, true);
+                                player.Infection = 100;
+                                EffectManager.sendEffect(20, 4, raycastHit.transform.position);
+                                player.Damage(90, new Vector3(0, 0, 0), EDeathCause.INFECTION, ELimb.SKULL, new CSteamID());
+                            }
+                        }
                     }
                     ChatManager.serverSendMessage(BlueCrystalCookingPlugin.Instance.Translate("stir_successful"),
                         Color.white, null, player.SteamPlayer(), EChatMode.SAY,

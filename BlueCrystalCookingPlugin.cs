@@ -208,6 +208,7 @@ namespace Ocelot.BlueCrystalCooking
 
         public override TranslationList DefaultTranslations => new TranslationList
         {
+            {"lethal_gas", "A <color=#ff3c19>lethal</color> was produced during production! Hopefully you have a <color=#1969ff>gas mask!</color>"},
             {"not_enough_ingredients", "There are <color=#ff3c19>not enough ingredients</color> in the barrel to stir them into blue crystal." },
             {"ingredient_added", "You have <color=#75ff19>added {0}</color> to the barrel." },
             {"stir_successful", "You have <color=#75ff19>successfully mixed</color> the ingredients into a tray filled with <color=#1969ff>liquid blue crystal</color>." },
